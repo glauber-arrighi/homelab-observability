@@ -1,0 +1,40 @@
+﻿name: CI/CD — homelab-observability
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint e validacao
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout codigo
+        uses: actions/checkout@v4
+
+      - name: Instalar yamllint
+        run: pip install yamllint
+
+      - name: Validar YAMLs
+        run: yamllint infra/kubernetes/
+
+  terraform-validate:
+    name: Validar Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout codigo
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform -chdir=infra/terraform init -backend=false
+
+      - name: Terraform Validate
+        run: terraform -chdir=infra/terraform validate
+
+      - name: Terraform Format Check
+        run: terraform -chdir=infra/terraform fmt -check
