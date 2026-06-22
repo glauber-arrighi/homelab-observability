@@ -1,0 +1,17 @@
+﻿# kube-prometheus-stack — valores utilizados na instalacao
+# helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
+
+grafana:
+  adminPassword: admin123
+
+prometheus:
+  prometheusSpec:
+    retention: 7d
+
+prometheusOperator:
+  admissionWebhooks:
+    enabled: true
+    patch:
+      enabled: true
+    certManager:
+      enabled: false
