@@ -1,4 +1,5 @@
-﻿# kube-prometheus-stack — valores utilizados na instalacao
+﻿---
+# kube-prometheus-stack — valores utilizados na instalacao
 # helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
 
 grafana:
