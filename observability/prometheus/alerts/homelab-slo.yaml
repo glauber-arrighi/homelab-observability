@@ -1,0 +1,36 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: homelab-slo
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: homelab.slo.recording
+      interval: 30s
+      rules:
+        - record: job:http_requests_success:rate5m
+          expr: sum(rate(http_requests_total{job="podinfo", status=~"2.."}[5m]))
+
+        - record: job:http_requests_total_all:rate5m
+          expr: sum(rate(http_requests_total{job="podinfo"}[5m]))
+
+        - record: job:sli_availability:ratio_rate5m
+          expr: |
+            job:http_requests_success:rate5m
+            /
+            job:http_requests_total_all:rate5m
+
+    - name: homelab.slo.alerts
+      rules:
+        - alert: SLOBurnRateAlto
+          expr: job:sli_availability:ratio_rate5m < 0.999
+          for: 2m
+          labels:
+            severity: critical
+            slo: availability
+          annotations:
+            summary: "SLO de disponibilidade abaixo de 99.9%"
+            description: "A demo-app esta com disponibilidade abaixo do SLO definido."
